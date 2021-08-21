@@ -23,7 +23,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_HOST): cv.string,
     vol.Required(CONF_PASSWORD): cv.string,
     vol.Required(CONF_USERNAME): cv.string,
-    vol.Required(CONF_TRACKED_MACS): cv.string
+    vol.Required(CONF_TRACKED_MACS): cv.ensure_list
 })
 
 
