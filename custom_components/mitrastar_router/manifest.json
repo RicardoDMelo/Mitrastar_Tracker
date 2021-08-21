@@ -1,0 +1,9 @@
+{
+    "domain": "mitrastar_router",
+    "name": "MitraStar Router",
+    "documentation": "https://github.com/RicardoDMelo/MitraStar_GPT-2541GNAC_HA",
+    "version": "1.0.0",
+    "requirements": [],
+    "dependencies": [],
+    "codeowners": []
+  }
