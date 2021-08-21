@@ -48,12 +48,14 @@ class MitraStarDeviceScanner(DeviceScanner):
             r'([0-9a-fA-F]{2}:' + '[0-9a-fA-F]{2}:' + '[0-9a-fA-F]{2}:' + '[0-9a-fA-F]{2}:' + '[0-9a-fA-F]{2}:' + '[0-9a-fA-F]{2})')
         self.parse_dhcp = re.compile(
             r'<td>([0-9a-zA-Z\-._]+)</td><td>([0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2})</td><td>([0-9]+.[0-9]+.[0-9]+.[0-9]+.[0-9]+)')
+        self.get_sid = re.compile(r'.*var sid = "(.*?)";.*')
 
         self.host = host
         self.username = username
         self.password = password
 
         self.LOGIN_URL = 'http://{ip}/login-login.cgi'.format(**{'ip': self.host})
+        self.LOGIN_HTML_URL = 'http://{ip}/login_frame.html'.format(**{'ip': self.host})
         self.headers1 = {
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36',
             'referer': 'http://192.168.15.1/login_frame.html',
@@ -109,9 +111,14 @@ class MitraStarDeviceScanner(DeviceScanner):
     def get_mitrastar_info(self):
         """Retrieve data from MitraStar GPT-2541GNAC Router."""
 
+        session1 = requests.Session()
         username1 = str(self.username)
         password1 = str(self.password)
-        sid = '26db0ff7'
+        login_html_response = session1.get(self.LOGIN_HTML_URL)
+        response_string = str(login_html_response.content)
+        sids = self.get_sid.findall(response_string)
+
+        sid = sids[0]
         text_to_hash = '{0}:{1}'.format(sid, password1)
         md5_hash = hashlib.md5(text_to_hash.encode('utf-8'))
         hashed_pwd = md5_hash.hexdigest()
@@ -128,7 +135,6 @@ class MitraStarDeviceScanner(DeviceScanner):
             'pass': ''
         }
 
-        session1 = requests.Session()
         login_response = session1.post(self.LOGIN_URL, data=data1, headers=self.headers1)
 
         if login_response.status_code == 200:
