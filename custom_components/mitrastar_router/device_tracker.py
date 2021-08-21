@@ -143,26 +143,16 @@ class MitraStarDeviceScanner(DeviceScanner):
 
             _LOGGER.info('Session cookie {session}'.format(**{'session': cookies["SESSION"].value}))
 
-            url1 = 'http://{}/wlextstationlist.cmd?action=view&wlSsidIdx=2'.format(self.host)
-            url2 = 'http://{}/wlextstationlist.cmd?action=view&wlSsidIdx=1'.format(self.host)
-            url3 = 'http://{}/arpview.cmd'.format(self.host)
+            url1 = 'http://{}/gvt_info.html'.format(self.host)
             url4 = 'http://{}/dhcpinfo.html'.format(self.host)
 
             result1 = self._read_table(session1, url1).lower()
             mac_address1 = self.parse_macs.findall(result1)
 
-            result2 = self._read_table(session1, url2).lower()
-            mac_address2 = self.parse_macs.findall(result2)
-
-            result3 = self._read_table(session1, url3).lower()
-            mac_address3 = self.parse_macs.findall(result3)
-
             result4 = self._read_table(session1, url4)
             result4 = result4.replace('\n ', '').replace(' ', '')
             hostnames = self.parse_dhcp.findall(result4)
 
-            mac_address1.extend([element for element in mac_address2 if element not in mac_address1])
-            mac_address1.extend([element for element in mac_address3 if element not in mac_address1])
             _LOGGER.info('MitraStar GPT-2541GNAC Router: Found %d devices' % len(mac_address1))
 
         else:
