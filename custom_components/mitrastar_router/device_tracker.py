@@ -18,11 +18,12 @@ from homeassistant.const import (CONF_HOST, CONF_PASSWORD, CONF_USERNAME)
 import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
-
+CONF_TRACKED_MACS = 'tracked_macs'
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_HOST): cv.string,
     vol.Required(CONF_PASSWORD): cv.string,
-    vol.Required(CONF_USERNAME): cv.string
+    vol.Required(CONF_USERNAME): cv.string,
+    vol.Required(CONF_TRACKED_MACS): cv.string
 })
 
 
@@ -40,6 +41,7 @@ class MitraStarDeviceScanner(DeviceScanner):
         host = config[CONF_HOST]
         username = config[CONF_USERNAME]
         password = config[CONF_PASSWORD]
+        tracked_macs = config[CONF_TRACKED_MACS]
 
         self.parse_macs = re.compile(
             r'([0-9a-fA-F]{2}:' + '[0-9a-fA-F]{2}:' + '[0-9a-fA-F]{2}:' + '[0-9a-fA-F]{2}:' + '[0-9a-fA-F]{2}:' + '[0-9a-fA-F]{2})')
@@ -50,6 +52,7 @@ class MitraStarDeviceScanner(DeviceScanner):
         self.host = host
         self.username = username
         self.password = password
+        self.tracked_macs = tracked_macs
 
         self.LOGIN_URL = 'http://{ip}/login-login.cgi'.format(**{'ip': self.host})
         self.LOGIN_HTML_URL = 'http://{ip}/login_frame.html'.format(**{'ip': self.host})
@@ -167,4 +170,5 @@ class MitraStarDeviceScanner(DeviceScanner):
             hostnames = None
             _LOGGER.error('Error connecting to the router...')
 
-        return mac_address1, hostnames
+        filtered_list = [element for element in self.tracked_macs if element in mac_address1]
+        return filtered_list, hostnames
