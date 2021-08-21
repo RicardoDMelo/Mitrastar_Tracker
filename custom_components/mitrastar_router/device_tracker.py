@@ -35,9 +35,6 @@ def get_scanner(hass, config):
 class MitraStarDeviceScanner(DeviceScanner):
     """This class queries a MitraStar GPT-2541GNAC wireless Router."""
 
-    def get_extra_attributes(self, device: str) -> dict:
-        pass
-
     def __init__(self, config):
         """Initialize the scanner."""
         host = config[CONF_HOST]
